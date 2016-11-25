@@ -43,13 +43,40 @@ def quickSort(A,l,r):
 	p_val = A[p]
 
 	A, p = partition(A,l,r,p,p_val)
-
+	
 	A = quickSort(A,l,p) # work on left
 	A = quickSort(A,p+1,r) # work on right
 
 	return A
 
-in_vec = [5,6,4,10,2,1,3,7,20,19]
+
+def quickSortCount(A,l,r,m):
+
+	# base case
+	if r == l:
+		return(A)
+
+	p = choosePivotFirst(A,l,r)
+	p_val = A[p]
+
+	m += r-l-1
+	A, p = partition(A,l,r,p,p_val)
+	
+	print(m)
+	A, m = quickSort(A,l,p,m) # work on left
+	A, m = quickSort(A,p+1,r,m) # work on right
+
+	return A, m
+
+
+#################################
+
+
+in_vec = [5,6,4,10,2,1,3,7,20]
+
+
 A1 = quickSort(in_vec,0,len(in_vec))
 print(A1)
+
+A2 = quickSortCount(in_vec,0,len(in_vec),0)
 
