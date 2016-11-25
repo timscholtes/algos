@@ -1,12 +1,17 @@
+import math
 
 def choosePivotFirst(A,l,r):
 	return l
 
 def choosePivotLast(A,l,r):
-	return r
+	return r-1
 
 def choosePivotMedian(A,l,r):
-	pass
+	l_val = A[l]
+	r_val = A[r-1]
+	mid = A[int(math.ceil((r-l-1)/2))]
+	sorted_vals = sorted([l_val,r_val,mid])
+	return sorted_vals[1]
 
 
 def partition(A,l,r,p,p_val):
@@ -39,7 +44,7 @@ def quickSort(A,l,r):
 	if r == l:
 		return(A)
 
-	p = choosePivotFirst(A,l,r)
+	p = choosePivotMedian(A,l,r)
 	p_val = A[p]
 
 	A, p = partition(A,l,r,p,p_val)
@@ -54,17 +59,16 @@ def quickSortCount(A,l,r,m):
 
 	# base case
 	if r == l:
-		return(A)
+		return A, m
 
-	p = choosePivotFirst(A,l,r)
+	p = choosePivotMedian(A,l,r)
 	p_val = A[p]
 
 	m += r-l-1
 	A, p = partition(A,l,r,p,p_val)
 	
-	print(m)
-	A, m = quickSort(A,l,p,m) # work on left
-	A, m = quickSort(A,p+1,r,m) # work on right
+	A, m = quickSortCount(A,l,p,m) # work on left
+	A, m = quickSortCount(A,p+1,r,m) # work on right
 
 	return A, m
 
@@ -72,11 +76,15 @@ def quickSortCount(A,l,r,m):
 #################################
 
 
-in_vec = [5,6,4,10,2,1,3,7,20]
+text_file = open("QuickSort.txt", "r")
+lines = text_file.read().split("\n")
+in_vec = [int(x) for x in lines]
 
+#in_vec = [1,2,3,4,0]
 
-A1 = quickSort(in_vec,0,len(in_vec))
+A1 = quickSort(in_vec,0,5)
 print(A1)
 
-A2 = quickSortCount(in_vec,0,len(in_vec),0)
 
+A2, m_final = quickSortCount(in_vec,0,len(in_vec)-1,0)
+#print(A2)
