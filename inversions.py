@@ -35,7 +35,7 @@ def mergeSort(A):
     return out
 
 
-print(mergeSort([1,4,3,2,7,5,9,8,10]))
+#print(mergeSort([1,4,3,2,7,5,9,8,10]))
 
 
 def merge2(B,C):
@@ -78,4 +78,10 @@ def inversionCount(A,inversions):
 
     return out
 
-print(inversionCount([1,4,3,2,7,5,9,8,10],0))
+#print(inversionCount([1,4,3,2,7,5,9,8,10],0))
+
+text_file = open("inversions.txt", "r")
+lines = text_file.read().split("\n")
+lines = [int(x) for x in lines]
+#print(lines[1:100])
+print(inversionCount(lines,0)[1])
