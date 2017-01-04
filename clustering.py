@@ -1,4 +1,3 @@
-from collections import Counter
 # we're going to create a union find class here
 # This will work via rank, and path compression for speed.
 # union choice is via a
@@ -45,22 +44,19 @@ class union_find:
 
 		if s1 > s2:
 			self.parents[p2] = p1
-			for i in range(self.n_vertices):
-				self.find_slow(i)
+			#for i in range(self.n_vertices):
+			#	self.find_slow(i)
 		elif s1 < s2:
 			self.parents[p1] = p2
-			for i in range(self.n_vertices):
-				self.find_slow(i)
+			#for i in range(self.n_vertices):
+			#	self.find_slow(i)
 		elif s1 == s2:
 			self.parents[p1] = p2
 			self.ranks[p2] += 1
-			for i in range(self.n_vertices):
-				self.find_slow(i)
-
-
-
-
+			#for i in range(self.n_vertices):
+			#	self.find_slow(i)
 		pass
+
 
 	def merge(self):
 		# sort the edges
@@ -78,16 +74,35 @@ class union_find:
 			p2 = self.find_slow(edge2contract[1])
 
 			if p1 != p2:
-				print self.k,len(set(self.parents))
 				self.union(p1,p2)
+		print consider,p1,p2,set(self.parents)
+
+		# now were done with the main loop, we need to carry on eliminating edges which are no separated
+		# This means
+		index = self.sorted_edge_costs.pop(0)
+		edge2contract = self.edges[index]
+
+		p1 = self.find_slow(edge2contract[0])
+		p2 = self.find_slow(edge2contract[1])
+
+		while p1 == p2:
+			consider += 1
+			index = self.sorted_edge_costs.pop(0)
+			edge2contract = self.edges[index]
+
+			p1 = self.find_slow(edge2contract[0])
+			p2 = self.find_slow(edge2contract[1])
+
+		print edge2contract,p1,p2
+		print consider
+
+
+		return self.edge_costs[index]
 
 
 
-		return self.edge_costs[self.sorted_edge_costs[0]]
-
-
-
-A_file = "/Users/timscholtes/Documents/Code/git_repos/data/clustering1.txt"
+#A_file = "/Users/timscholtes/Documents/Code/git_repos/data/clustering1.txt"
+A_file = "Z:/GROUP/TIM/pp/data/clustering1.txt"
 
 edge_uv = []
 edge_costs = []
