@@ -15,20 +15,28 @@ def DFS_loop(grph,run_order):
 
 
 def DFS(grph,v,ft,leader,explored_bool,t):
-	S = []
-	S.append(v)
-	s = v
-	while len(S)>0:
-		# need to check there are outgoing edges!
-		v = S.pop()
-		leader[s-1] += 1
-		if not explored_bool[v]:
+	if not explored_bool[v]:
+		S = []
+		S.append(v)
+		s = v
+		while len(S)>0:
+			# need to check there are outgoing edges!
+			v = S[len(S)-1]
 			explored_bool[v] = True
-			for w in grph[v]:
-				S.append(w)
-		else:
-			t += 1
-			ft[v-1] = t
+			check = True
+			k = 0
+			while check and k < len(grph[v]):
+				w = grph[v][k]
+				if not explored_bool[w]:
+					S.append(w)
+					check = False
+				k += 1
+			if check:
+				v = S.pop()
+				leader[s - 1] += 1
+				t += 1
+				ft[v - 1] = t
+
 	return ft, leader, explored_bool, t
 
 
@@ -50,19 +58,16 @@ def kosaraju(graph_file):
 			graph_rev[line[1]].append(line[0])
 
 	print "read in"
-
 	# run a DFS loop on G, in reverse fashion. Record finishing time.
 	ft,leader = DFS_loop(graph_rev,reversed(graph_rev.keys()))
-	print "finished first pass"
-	ft_order = sorted(range(len(ft)), key=lambda k: ft[k])
-	print ft_order[0:20]
-	print ft_order[::-1][0:20]
-	# run DFS loop on G, forward, using finishing time as loop sequence. Record leaders.
-	# Within each segment of DFS (i.e. during DFS's exploration phase),
-	# increment a count of vertices belonging to leader vertex
-	#DFS_loop(graph,ft_stack)
-	ft,leader = DFS_loop(graph,ft_order[::-1])
-	leader.sort(reverse=True)
-	return leader[0:4]
 
-print kosaraju("scc.txt")
+	ft_order = sorted(range(len(ft)), key=lambda k: ft[k])
+	ft_order = [k+1 for k in ft_order]
+
+	# run DFS loop on G, forward, using finishing time as loop sequence.
+	ft,leader = DFS_loop(graph,ft_order[::-1])
+
+	leader.sort(reverse=True)
+	return leader[0:5]
+
+print kosaraju("/Users/timscholtes/Documents/Code/git_repos/data/scc.txt")
