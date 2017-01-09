@@ -52,17 +52,19 @@ class PriorityQueue(object):
 
 class dijkstra:
 
-	def __init__(self,graph_file,start):
+	def __init__(self,graph,start):
 		# initialize some arrays:
-		self.X = {start}
-		self.graph = {}
+		self.X = {start} # the set of explored indices
+		self.graph = graph
+		self.pq = PriorityQueue()
 
-		with open(graph_file) as file:
-			for index, line in enumerate(file):
-				heads = [i for i in line.split()]
-				self.graph[int(heads[0])] = [list(map(int,i.split(',')))[::-1] for i in heads[1:]]
 		self.N = len(self.graph)
-		self.A = {n:0 for n in range(1,self.N+1)}
+		self.A = {n:0 for n in range(1,self.N+1)} # the distances to each index
+
+		# fill the heap with the start endpoints
+		for v in self.graph[start]:
+			self.pq.insert(v[1],v[0])
+
 		pass
 
 	def graph_inspect(self,K):
@@ -97,17 +99,19 @@ class dijkstra:
 		pass
 
 	def main_loop_heap(self):
+		""" Fast method using heaps """
 		while len(self.X) < self.N:
-			new_vertex = self.pq.pop()
-			self.A[new_vertex[1]] = new_vertex[0]
-			self.X.add(new_vertex[1])
-			self.heap_update(new_vertex)
+			new_vertex = self.pq.pop() # pop nearest vertex by dist (hence heap)
+			self.A[new_vertex[1]] = new_vertex[0] # update distance to A
+			self.X.add(new_vertex[1]) # add the vertex to explored
+			self.heap_update(new_vertex) # update value in heap
 		print "Done"
 
 		return self.A
 
-	def main_loop(self):
 
+	def main_loop(self):
+		""" Slow method (not heap) """
 		while len(self.X)<self.N:
 			self.edge_picker()
 		print "Done"
@@ -115,15 +119,20 @@ class dijkstra:
 		return self.A
 
 
-dij = dijkstra("/Users/timscholtes/Documents/Code/git_repos/data/shortest_path.txt",1)
-dij.graph_inspect(100)
-tic = time.clock()
-A = dij.main_loop_heap()
-toc = time.clock()
-print 'heap: ', toc-tic
+if __name__ == '__main__':
 
-tic = time.clock()
-A = dij.main_loop()
-toc = time.clock()
-print 'heap: ', toc-tic
+	graph = {}
+	graph_file = "/Users/timscholtes/Documents/Code/git_repos/data/shortest_path.txt"
+	with open(graph_file) as file:
+		for index, line in enumerate(file):
+			heads = [i for i in line.split()]
+			graph[int(heads[0])] = [list(map(int, i.split(',')))[::-1] for i in heads[1:]]
+
+	dij = dijkstra(graph,1)
+
+	#dij.graph_inspect(100)
+	tic = time.clock()
+	A = dij.main_loop_heap()
+	toc = time.clock()
+	print 'heap: ', toc-tic
 
