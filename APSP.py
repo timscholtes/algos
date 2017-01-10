@@ -14,9 +14,9 @@ import dijkstra
 import numpy as np
 
 
-def outer_bf(A,N):
+def outer_bf(A,N,graph):
 	for i in range(1,N):
-		A,carry_on = inner_bf(A,N)
+		A,carry_on = inner_bf(A,N,graph)
 		if carry_on == False:
 			break
 	return A
@@ -31,17 +31,17 @@ def min_searcher(A,v,graph):
 	return min(candidates)
 
 
-def subproblem_recurse(A,N):
+def subproblem_recurse(A,N,graph):
 	B = list(A)
-	for v in range(N + 1):
+	for v in range(N):
 		case1 = A[v]
-		case2 = min_searcher(A, graph[v])
+		case2 = min_searcher(A, v, graph)
 		B[v] = min(case1, case2)
 	return B
 
 
-def inner_bf(A,N):
-	B = subproblem_recurse(A,N)
+def inner_bf(A,N,graph):
+	B = subproblem_recurse(A,N,graph)
 	if A == B:
 		carry_on = False
 	else:
@@ -49,8 +49,8 @@ def inner_bf(A,N):
 	return B,carry_on
 
 
-def neg_cyc_check(A,N):
-	B = subproblem_recurse(A, N)
+def neg_cyc_check(A,N,graph):
+	B = subproblem_recurse(A, N,graph)
 	neg_cyc = A != B
 	return neg_cyc
 
@@ -58,14 +58,18 @@ def neg_cyc_check(A,N):
 def bellman_ford(graph,N):
 
 	A = [np.inf for i in range(N+1)]
-	A[len(N)+1] = 0
+	A[N] = 0
 	for i in range(N):
-		edges.append([N+1,i,0])
+		#graph.append([N+1,i,0])
+		graph[i].append([N,0])
+		#graph[i+1].append([N+1,0])
+	print 'graph enhanced with s'
 
-	A = outer_bf(A,N)
-	neg_cyc = neg_cyc_check(A,N)
+	A = outer_bf(A,N,graph)
+	neg_cyc = neg_cyc_check(A,N,graph)
 	A.pop()
 	return A,neg_cyc
+
 
 def adjuster(graph,adjustments):
 	for i in range(N):
@@ -73,13 +77,14 @@ def adjuster(graph,adjustments):
 	return graph
 
 
-def johnson(G_N):
+def johnson(graph_head,graph_tail,N):
 	# pass bellman ford the graph as a list by head vertex.
 	adjustments,neg_cyc = bellman_ford(graph_head,N)
 	if neg_cyc:
 		return 'NULL'
 
 	graph_tail = adjuster(graph_tail,adjustments)
+	print 'tail graph adjusted, running dijkstra'
 	lengths = []
 	for s in range(N):
 		dij = dijkstra.dijkstra(graph_tail,s)
@@ -89,5 +94,26 @@ def johnson(G_N):
 
 if __name__ == '__main__':
 	# run johnson on the 3 graphs provided by coursera
+
+	# load in first set:
+	g_file = "/Users/timscholtes/Documents/Code/git_repos/data/g3.txt"
+	g_file = "Z:/GROUP/TIM/pp/data/g1.txt"
+
+	with open(g_file) as file:
+		for number, line in enumerate(file):
+			if number == 0:
+				N, M = line.split()
+				N = int(N)
+				M = int(M)
+				graph_head = [[] for key in range(1, N+1)]
+				graph_tail = [[] for key in range(1, N+1)]
+			else:
+				edge = ([int(i) for i in line.split()])
+				graph_head[edge[1]-1].append([edge[0]-1,edge[2]])
+				graph_tail[edge[0]-1].append([edge[1]-1,edge[2]])
+
+	#print graph_head[0]
+	A = johnson(graph_head,graph_tail,N)
+	print A
 	pass
 
