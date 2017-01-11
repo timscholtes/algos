@@ -27,7 +27,7 @@ def min_searcher(A,v,graph):
 	candidates = []
 	for e in edges:
 		# the 0 index of e is the tail vertex, 1 index is the cost
-		candidates.append(A[e[0]]+e[1])
+		candidates.append(A[e[1]]+e[0])
 	return min(candidates)
 
 
@@ -61,7 +61,7 @@ def bellman_ford(graph,N):
 	A[N] = 0
 	for i in range(N):
 		#graph.append([N+1,i,0])
-		graph[i].append([N,0])
+		graph[i].append([0,N])
 		#graph[i+1].append([N+1,0])
 	print 'graph enhanced with s'
 
@@ -73,7 +73,8 @@ def bellman_ford(graph,N):
 
 def adjuster(graph,adjustments):
 	for i in range(N):
-		graph[i][2] += adjustments[i]
+		for v in graph[i]:
+			v[0] += adjustments[i]-adjustments[v[1]]
 	return graph
 
 
@@ -88,7 +89,14 @@ def johnson(graph_head,graph_tail,N):
 	lengths = []
 	for s in range(N):
 		dij = dijkstra.dijkstra(graph_tail,s)
-		lengths.append(dij.main_loop_heap())
+		#dij.__init__(graph_tail,s)
+		
+		sv = dij.main_loop_heap()
+		# now readjust sv
+		for i in range(len(sv)):
+			sv[i] += adjustments[i]-adjustments[s]
+
+		lengths.append(min(sv))
 	return min(lengths)
 
 
@@ -97,7 +105,8 @@ if __name__ == '__main__':
 
 	# load in first set:
 	g_file = "/Users/timscholtes/Documents/Code/git_repos/data/g3.txt"
-	g_file = "Z:/GROUP/TIM/pp/data/g1.txt"
+	g_file = "Z:/GROUP/TIM/pp/data/g3.txt"
+	#g_file = "Z:/GROUP/TIM/pp/data/johnson_demo.txt"
 
 	with open(g_file) as file:
 		for number, line in enumerate(file):
@@ -109,11 +118,19 @@ if __name__ == '__main__':
 				graph_tail = [[] for key in range(1, N+1)]
 			else:
 				edge = ([int(i) for i in line.split()])
-				graph_head[edge[1]-1].append([edge[0]-1,edge[2]])
-				graph_tail[edge[0]-1].append([edge[1]-1,edge[2]])
+				# dijkstra is written to take the length first, then the vertex.
+				graph_head[edge[1]-1].append([edge[2],edge[0]-1])
+				graph_tail[edge[0]-1].append([edge[2],edge[1]-1])
 
-	#print graph_head[0]
+	for v,u in enumerate(graph_head):
+		u.append([0,v])
+	for u,v in enumerate(graph_tail):
+		v.append([0,u])
+
 	A = johnson(graph_head,graph_tail,N)
+	#adj,A = bellman_ford(graph_head,N)
+	#print adj
+	
 	print A
 	pass
 

@@ -56,10 +56,10 @@ class dijkstra:
 		# initialize some arrays:
 		self.X = {start} # the set of explored indices
 		self.graph = graph
-		self.pq = PriorityQueue()
+		self.pq = PriorityQueue(heap=[])
 
 		self.N = len(self.graph)
-		self.A = {n:0 for n in range(1,self.N+1)} # the distances to each index
+		self.A = [0 for n in range(self.N)] # the distances to each index
 
 		# fill the heap with the start endpoints
 		for v in self.graph[start]:
@@ -100,12 +100,13 @@ class dijkstra:
 
 	def main_loop_heap(self):
 		""" Fast method using heaps """
-		while len(self.X) < self.N:
+		#while len(self.X) < self.N and self.pq.heap:
+		while len(self.pq.entry_finder)>0:
+
 			new_vertex = self.pq.pop() # pop nearest vertex by dist (hence heap)
 			self.A[new_vertex[1]] = new_vertex[0] # update distance to A
 			self.X.add(new_vertex[1]) # add the vertex to explored
 			self.heap_update(new_vertex) # update value in heap
-		print "Done"
 
 		return self.A
 
