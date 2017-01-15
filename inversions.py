@@ -12,7 +12,7 @@ def merge(B,C):
         else:
             D.append(C[j])
             j += 1
-    return (D)
+    return D
 
 def mergeSort(A):
 
@@ -74,7 +74,8 @@ def inversionCount(A,inversions):
         B = A[:split_len]
         C = A[split_len:]
 
-        out = merge2(inversionCount(B,inversions),inversionCount(C,inversions))
+        out = merge2(inversionCount(B,inversions),
+            inversionCount(C,inversions))
 
     return out
 
